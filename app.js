@@ -1,21 +1,33 @@
 const express = require("express");
-const app = express ();
-app.use(express.json());
+const http = require('http');
+const WebSocket = require('ws');
+
+const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
 
-const PORT = process.env.PORT || 3000;
+wss.on('connection', (ws) => {
+    console.log('WebSocket connection established');
 
-app.get('/status', (request, response) => {
+    ws.on('message', (message) => {
+        console.log(`Received message: ${message}`);
 
-    const status = {
-       'Status': 'Running on port no. ' + PORT
-    };
+        // Simulate a basic chatbot response
+        const response = `You said: ${message}`;
+        ws.send(response);
+    });
 
-    response.send(status);
-    
- });
+    ws.on('close', () => {
+        console.log('WebSocket connection closed');
+    });
+});
 
-app.listen(PORT, () => {
+
+const PORT = process.env.PORT || 3001;
+
+
+server.listen(PORT, () => {
     console.log("Server Listening on PORT:", PORT);
 });
 
